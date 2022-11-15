@@ -1,10 +1,14 @@
+DROP TABLE IF EXISTS order_item;
+DROP TABLE IF EXISTS "order";
+DROP TABLE IF EXISTS pizza;
+DROP TABLE IF EXISTS pizza_category;
+DROP TABLE IF EXISTS pizza_size;
+
 CREATE TABLE public."order"
 (
-    id integer NOT NULL,
+    id bigserial PRIMARY KEY,
     order_date date,
-    order_time time without time zone,
-    total_price real,
-    PRIMARY KEY (id)
+    order_time time without time zone
 );
 
 ALTER TABLE IF EXISTS public."order"
@@ -12,7 +16,7 @@ ALTER TABLE IF EXISTS public."order"
 
 CREATE TABLE public.pizza_category
 (
-    id integer NOT NULL,
+    id bigserial,
     name "char" NOT NULL,
     PRIMARY KEY (id)
 );
@@ -22,7 +26,7 @@ ALTER TABLE IF EXISTS public.pizza_category
 
 CREATE TABLE public.pizza_size
 (
-    id integer NOT NULL,
+    id bigserial,
     name "char" NOT NULL,
     PRIMARY KEY (id)
 );
@@ -32,10 +36,9 @@ ALTER TABLE IF EXISTS public.pizza_size
 
 CREATE TABLE public.pizza
 (
-    id integer NOT NULL,
+    id CHAR(50),
     category_id integer,
     size_id integer,
-    ingredients text,
     name "char" NOT NULL,
     price real NOT NULL,
     PRIMARY KEY (id),
@@ -49,11 +52,10 @@ ALTER TABLE IF EXISTS public.pizza
 
 CREATE TABLE public.order_item
 (
-    id integer NOT NULL,
+    id bigserial,
     order_id integer NOT NULL,
-    pizza_id integer NOT NULL,
+    pizza_id CHAR(50) NOT NULL,
     quantity integer NOT NULL DEFAULT 1,
-    unit_price real NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (order_id) REFERENCES public."order" (id),
     FOREIGN KEY (pizza_id) REFERENCES pizza (id)

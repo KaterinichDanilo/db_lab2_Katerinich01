@@ -1,5 +1,6 @@
 import psycopg2
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 
 username = 'postgres'
@@ -21,14 +22,17 @@ LEFT JOIN order_item ON order_item.pizza_id = pizza.id
 GROUP BY pizza.id;
 '''
 query_3 = '''
-SELECT "order".id, SUM(order_item.total_price) 
+SELECT "order".id, SUM(order_item.quantity*pizza.price) 
 FROM "order"
 LEFT JOIN order_item ON order_item.order_id = "order".id
+LEFT JOIN pizza ON order_item.pizza_id = pizza.id
 GROUP BY "order".id
-ORDER BY "order".id
+ORDER BY "order".id;
 '''
 
 conn = psycopg2.connect(user=username, password=password, dbname=database, host=host, port=port)
+ax = plt.figure().gca()
+ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
 with conn:
     cur1 = conn.cursor()
@@ -70,8 +74,21 @@ with conn:
         orderId.append(row[0])
         price.append(row[1])
 
+    # plt.plot(orderId, price)
+    # plt.plot(price, marker='o')
+    # plt.title('Вартість кожного замовлення', size=10)
+    # plt.ylabel('Загальна вартіть', size=10)
+    # plt.show()
+
+    ax = plt.figure().gca()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
     plt.plot(orderId, price)
-    plt.plot(price, marker='o')
-    plt.title('Вартість кожного замовлення', size=20)
-    plt.ylabel('Загальна вартіть', size=15)
+    plt.xlabel('Номер замовлення')
+    plt.ylabel('Ціна, $')
+    plt.title('Графік залежності ціни від номеру замовлення')
+
+    # for qnt, iprice in zip(orderId, price):
+    #     plt.annotate(iprice, xy=(qnt, ""+iprice))
+
     plt.show()
